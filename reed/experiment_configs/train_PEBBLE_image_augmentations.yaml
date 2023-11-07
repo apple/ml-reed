@@ -1,0 +1,141 @@
+#
+# For licensing see accompanying LICENSE file.
+# Copyright (C) 2023 Apple Inc. All Rights Reserved.
+#
+defaults:
+    - agent: sac
+    
+# this needs to be specified manually
+experiment: pebble_image_augmentations
+
+# the random seed that will be used for running the experiments
+seed: 1
+
+# the location where the results and models will be written
+out_dir:
+
+# Environment
+env: walker_walk
+
+# device used to run experiments
+device: cuda
+
+# reward learning
+segment_size: 50
+activation: tanh
+use_shared_conv_parameters: true
+reward_state_embed_dim: 20
+reward_action_embed_dim: 10
+reward_hidden_embed_dim: 256
+reward_num_hidden_layers: 3
+reward_lr: 0.0003
+reward_optimizer: "adam"
+reward_weight_decay: 0
+reward_train_batch: 100
+reward_update: 50  # the number of training epochs for each preference dataset version
+ensemble_size: 3
+ssl_state_encoder_mimics_reward_model: True
+assess_ensemble_disagreement: true
+
+# added to handle learning the reward on top of image observations
+reward_from_image_observations: true
+image_encoder_architecture: "pixl2r"
+image_hidden_num_channels: 32
+image_height: 50
+image_width: 50
+grayscale_images: false
+normalized_images: true
+camera_name: "topview"
+
+# number of training epochs for the SSC objective
+self_supervised_consistency_epochs: 1
+self_supervised_consistency_lr: 0.0001
+consistency_comparison_dim: 128
+self_supervised_consistency_batch: 128
+self_supervised_consistency_projection_size: 128
+self_supervised_consistency_comparison_hidden_size: 256
+self_supervised_consistency_architecture: "mosaic"
+self_supervised_consistency_optimizer: "adam"
+self_supervised_consistency_lr_scheduler: false
+gaussian_noise_states_prob: 0.0
+sfc_train_interval: 1
+with_batch_norm: false
+contrastive_ssc: false  # trains the SSC network with a contrastive loss instead of SimSiam style loss
+temperature: 0.1
+feature_dropout: 0.0
+freeze_pretrained_parameters: false
+
+use_strong_augs: false
+data_augs: ${augs}
+augs:
+  # Strong augmentation settings.
+  strong_jitter: 0.01 
+  grayscale: 0.01
+  flip: 0.05 
+  strong_crop_scale_min: 0.6
+  strong_crop_scale_max: 1.0
+  strong_crop_ratio_min: 1.8
+  strong_crop_ratio_max: 1.8
+
+  # Weak augmentation settings
+  weak_jitter: 0.01
+  weak_crop_scale_min: 0.7
+  weak_crop_scale_max: 1.0
+  weak_crop_ratio_min: 1.8
+  weak_crop_ratio_max: 1.8
+
+  # Augmentation settings for both strong and weak
+  blur_sigma_min: .1
+  blur_sigma_max: 2.0
+  rand_trans: 0.1
+  
+# whether to save the image preference dataset
+save_image_observations: true
+saved_image_height: 200
+saved_image_width: 200
+
+# managing and building the preference dataset
+max_feedback: 1400
+num_interact: 5000
+preference_dataset_update_size: ${reward_train_batch}
+feed_type: 0
+preference_dataset_capacity: ${max_feedback}
+preference_dataset_large_update_size: 10
+label_margin: 0.0
+teacher_beta: -1
+teacher_gamma: 1
+teacher_eps_mistake: 0
+teacher_eps_skip: 0
+teacher_eps_equal: 0
+
+# policy training
+action_repeat: 1
+num_train_steps: 500000
+num_seed_steps: 1000
+num_unsup_steps: 9000
+training_split_size: 0.8
+shuffle_ds: True
+reset_update: 100
+replay_buffer_capacity: ${num_train_steps}
+gradient_update: 1
+interact_frequency: 20000
+
+# determines how many states are compared during unsupervised exploration
+topK: 5
+
+# evaluation config
+eval_frequency: 10000
+num_eval_episodes: 10
+
+# logger
+log_frequency: 10000
+log_save_tb: true
+
+# video recorder
+save_video: false
+
+# hydra configuration
+hydra:
+    name: ${env}
+    run:
+        dir: ./exp/${env}/H${diag_gaussian_actor.params.hidden_dim}_L${diag_gaussian_actor.params.hidden_depth}_lr${agent.params.actor_lr}/teacher_b${teacher_beta}_g${teacher_gamma}_m${teacher_eps_mistake}_s${teacher_eps_skip}_e${teacher_eps_equal}/label_smooth_${label_margin}/schedule_${reward_schedule}/${experiment}_init${num_seed_steps}_unsup${num_unsup_steps}_inter${num_interact}_maxfeed${max_feedback}_seg${segment}_act${activation}_Rlr${reward_lr}_Rbatch${reward_batch}_Rupdate${reward_update}_en${ensemble_size}_sample${feed_type}_large_batch${large_batch}_seed${seed}
