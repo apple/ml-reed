@@ -1,0 +1,53 @@
+## Copyright (C) 2023 Apple Inc. All rights reserved.
+#
+
+# Tell pip to use flit to build this pacakge
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "reed"
+author = "Katherine Metcalf"
+author-email = "kmetcalf@apple.com"
+
+license = "Apple Internal"
+requires-python = ">=3.9"
+description-file="README.md"
+
+# List here all your dependencies
+requires = [
+    "gym",
+    "torch",
+    "matplotlib",
+    "attr",
+    "attrs",
+    "matplotlib",
+    "pyyaml",
+    "scikit-image",
+    "mujoco_py",
+    "stable-baselines3",
+    "awscli",
+    "tensorboardX",
+    "visdom",
+    "wandb"
+]
+
+[tool.flit.metadata.requires-extra]
+# Packages required for testing
+test = [
+    "pytest",
+    "pytest-mypy",
+    "pytest-flake8",
+    "pytest-cov",
+    "flake8-docstrings",
+    "flake8-copyright",
+]
+# Packages required to build the documentation
+doc = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "m2r2"
+]
+
+[tool.flit.scripts]

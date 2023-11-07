@@ -1,0 +1,127 @@
+#
+# For licensing see accompanying LICENSE file.
+# Copyright (C) 2023 Apple Inc. All Rights Reserved.
+#
+defaults:
+    - agent: sac
+
+# this needs to be specified manually
+experiment: reed
+
+# the location where the results and models will be written
+out_dir:
+
+# random seed for consistent performance
+seed: 6789
+
+# Environment
+env: walker_walk
+
+# device used to run experiments
+device: cuda
+
+###########################
+# SPR Training Parameters #
+###########################
+
+# whether to completely train on the SPR objective before training on the preference objective - run all SPR epochs and
+# then run all preference epochs
+self_future_consistency_pretrain: true
+# whether to train on the SPR objective and then on the preference objective for each preference epoch - train on SPR
+# objective for some number of epochs and then train on preference objective for 1 epoch (repeat for the specified
+# number of preference epochs)
+joint_learning: false
+# number of training epochs for the SPR objective
+self_future_consistency_epochs: 1
+self_future_consistency_lr: 0.0003
+self_future_consistency_batch: 128
+# the target of the SFC model
+self_future_consistency_target: "next_observation"
+# controls the architecture used to predict the next state representation and then to project the current and
+# next state representations before comparing. The name of the architecture references the source paper.
+# the options are "simsiam" and "mosaic"
+self_future_consistency_projection_size: 128
+self_future_consistency_comparison_hidden_size: 256
+self_future_consistency_architecture: "mosaic"
+self_future_consistency_num_hidden_layers: 3
+self_future_consistency_optimizer: "sgd"
+self_future_consistency_lr_scheduler: false
+normalize_states: false
+gaussian_noise_states_prob: 0.0
+# update on the SPR objective every so many preference objective epochs. 1 - train on SPR everytime you train on the
+# preference objective; 2 - train on SPR every other time you train on the preference objective
+sfc_train_interval: 1
+k_step_future_predictions: 1
+with_batch_norm: false
+contrastive_sfc: false  # trains the SFC network with a contrastive loss instead of SimSiam style loss
+temperature: 0.1
+feature_dropout: 0.0
+
+##############################
+# Reward Training Parameters #
+##############################
+segment_size: 50
+activation: tanh
+reward_state_embed_dim: 20
+reward_action_embed_dim: 10
+reward_hidden_embed_dim: 256
+reward_num_hidden_layers: 3
+# whether to freeze the parameters shared with the SPR network
+freeze_pretrained_parameters: false
+reward_lr: 0.0003
+reward_optimizer: "adam"
+reward_weight_decay: 0
+reward_train_batch: 100
+reward_update: 50
+ensemble_size: 3
+assess_ensemble_disagreement: true
+
+# added to handle learning the reward on top of image observations
+reward_from_image_observations: false
+
+# whether to save the image preference dataset
+save_image_observations: true
+saved_image_height: 200
+saved_image_width: 200
+
+# managing and building the preference dataset
+max_feedback: 1400
+num_interact: 5000
+preference_dataset_update_size: ${reward_train_batch}
+feed_type: 0
+preference_dataset_capacity: ${max_feedback}
+preference_dataset_large_update_size: 10
+label_margin: 0.0
+teacher_beta: -1
+teacher_gamma: 1
+teacher_eps_mistake: 0
+teacher_eps_skip: 0
+teacher_eps_equal: 0
+
+##################################
+# Policy Training and Evaluation #
+##################################
+action_repeat: 1
+num_seed_steps: 1000
+num_unsup_steps: 9000
+training_split_size: 0.8
+shuffle_ds: True
+num_train_steps: 500000
+replay_buffer_capacity: ${num_train_steps}
+eval_frequency: 10000
+num_eval_episodes: 10
+gradient_update: 1
+reset_update: 100
+
+# determines how many states are compared during unsupervised exploration
+topK: 5
+
+# logger
+log_frequency: 10000
+log_save_tb: true
+
+# hydra configuration
+hydra:
+    name: ${env}
+    run:
+        dir: ./exp/${env}/H${diag_gaussian_actor.params.hidden_dim}_L${diag_gaussian_actor.params.hidden_depth}_lr${agent.params.actor_lr}/teacher_b${teacher_beta}_g${teacher_gamma}_m${teacher_eps_mistake}_s${teacher_eps_skip}_e${teacher_eps_equal}/label_smooth_${label_margin}/schedule_${reward_schedule}/${experiment}_init${num_seed_steps}_unsup${num_unsup_steps}_inter${num_interact}_maxfeed${max_feedback}_seg${segment}_act${activation}_Rlr${reward_lr}_Rbatch${reward_batch}_Rupdate${reward_update}_en${ensemble_size}_sample${feed_type}_large_batch${large_batch}_seed${seed}

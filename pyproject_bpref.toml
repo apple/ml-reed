@@ -1,0 +1,51 @@
+## Copyright (C) 2021 Apple Inc. All rights reserved.
+#
+
+# Tell pip to use flit to build this pacakge
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "BPref"
+author = "rll-researcher"
+author-email = ""
+
+license = "MIT"
+requires-python = ">=3.7"
+description-file="README.md"
+
+# List here all your dependencies
+requires = [
+    "absl-py",
+    "pyparsing",
+    "termcolor",
+    "dm_control",
+    "tb-nightly",
+    "imageio",
+    "imageio-ffmpeg",
+    "omegaconf==1.4.0",
+    "hydra-core==0.11",
+    "matplotlib",
+    "glfw",
+    "scikit-image"
+]
+
+[tool.flit.metadata.requires-extra]
+# Packages required for testing
+test = [
+    "pytest",
+    "pytest-mypy",
+    "pytest-flake8",
+    "pytest-cov",
+    "flake8-docstrings",
+    "flake8-copyright",
+]
+# Packages required to build the documentation
+doc = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "m2r2"
+]
+
+[tool.flit.scripts]

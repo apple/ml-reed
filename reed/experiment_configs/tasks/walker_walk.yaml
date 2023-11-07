@@ -1,0 +1,41 @@
+#
+# For licensing see accompanying LICENSE file.
+# Copyright (C) 2023 Apple Inc. All Rights Reserved.
+#
+env: walker_walk
+pebble:
+  agent.params.actor_lr: 0.0005
+  agent.params.critic_lr: 0.0005
+  reward_update: 50
+  reward_lr: 3e-4
+  gradient_update: 1
+  activation: tanh
+  num_unsup_steps: 9000
+  num_train_steps: 500000
+  num_interact: 20000
+contrastive_reed:
+  joint_learning: false
+  self_future_consistency_pretrain: true
+  self_future_consistency_lr: 1e-3
+  self_future_consistency_optimizer: "sgd"
+  self_future_consistency_epochs: 20
+  self_future_consistency_batch: 12
+  reward_state_embed_dim: 20
+  reward_action_embed_dim: 10
+  self_future_consistency_projection_size: 20
+  activation: tanh
+  contrastive_sfc: true
+  temperature: 0.5
+distillation_reed:
+  joint_learning: false
+  self_future_consistency_pretrain: true
+  self_future_consistency_lr: 1e-3
+  self_future_consistency_optimizer: "sgd"
+  self_future_consistency_epochs: 20
+  self_future_consistency_batch: 12
+  reward_state_embed_dim: 20
+  reward_action_embed_dim: 10
+  self_future_consistency_projection_size: 20
+  activation: tanh
+  contrastive_sfc: false
+  temperature: 0.

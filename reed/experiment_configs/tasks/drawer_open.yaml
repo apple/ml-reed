@@ -1,0 +1,56 @@
+#
+# For licensing see accompanying LICENSE file.
+# Copyright (C) 2023 Apple Inc. All Rights Reserved.
+#
+env: metaworld_drawer-open-v2
+pebble:
+  agent.params.actor_lr: 0.0003
+  agent.params.critic_lr: 0.0003
+  agent.params.batch_size: 512
+  double_q_critic.params.hidden_dim: 256
+  double_q_critic.params.hidden_depth: 3
+  diag_gaussian_actor.params.hidden_dim: 256
+  diag_gaussian_actor.params.hidden_depth: 3
+  reward_update: 10
+  reward_lr: 3e-4
+  gradient_update: 1
+  activation: tanh
+  num_unsup_steps: 9000
+  num_train_steps: 1000000
+  num_interact: 5000
+distillation_reed:
+  joint_learning: false
+  self_future_consistency_pretrain: true
+  self_future_consistency_lr: 5e-5
+  self_future_consistency_optimizer: "adam"
+  self_future_consistency_epochs: 20
+  self_future_consistency_batch: 256
+  reward_state_embed_dim: 39
+  reward_action_embed_dim: 4
+  activation: tanh
+  with_batch_norm: true
+  normalize_states: true
+  gaussian_noise_states_prob: 0.
+  self_future_consistency_projection_size: 39
+  sfc_train_interval: 4
+  k_step_future_predictions: 1
+  contrastive_sfc: false  # trains the SFC network with a contrastive loss instead of SimSiam style loss
+  temperature: 0.
+contrastive_reed:
+  joint_learning: false
+  self_future_consistency_pretrain: true
+  self_future_consistency_lr: 0.0001
+  self_future_consistency_optimizer: "adam"
+  self_future_consistency_epochs: 10
+  self_future_consistency_batch: 128
+  reward_state_embed_dim: 10
+  reward_action_embed_dim: 4
+  activation: tanh
+  with_batch_norm: true
+  normalize_states: false
+  gaussian_noise_states_prob: 0.
+  self_future_consistency_projection_size: 10
+  sfc_train_interval: 4
+  k_step_future_predictions: 1
+  contrastive_sfc: true # trains the SFC network with a contrastive loss instead of SimSiam style loss
+  temperature: 0.1
