@@ -3,8 +3,8 @@
 
 # Tell pip to use flit to build this pacakge
 [build-system]
-requires = ["flit"]
-build-backend = "flit.buildapi"
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
 
 [tool.flit.metadata]
 module = "reed"
